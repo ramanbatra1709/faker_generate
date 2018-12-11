@@ -1,0 +1,5 @@
+faker_generate.admin.content.generate:
+  title: 'Faker Generate Content'
+  description: 'Generate dummy content'
+  route_name: faker_generate.generate_content
+  parent: system.admin_config_development
