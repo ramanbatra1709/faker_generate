@@ -1,0 +1,16 @@
+{
+  "name": "drupal/faker_generate",
+  "type": "drupal-module",
+  "description": "Generates realistic looking dummy content using Faker PHP Library",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/faker_generate",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/faker_generate",
+    "source": "http://cgit.drupalcode.org/faker_generate"
+  },
+  "require": {
+    "fzaninotto/faker": "^1.8"
+  }
+}

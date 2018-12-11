@@ -1,0 +1,5 @@
+name: 'Faker Generate'
+type: module
+description: 'Generates realistic looking dummy content using Faker PHP Library'
+core: 8.x
+package: 'Faker Generate'

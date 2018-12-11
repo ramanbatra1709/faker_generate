@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains faker_generate.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function faker_generate_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the faker_generate module.
+    case 'help.page.faker_generate':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Generates realistic looking dummy content using Faker PHP Library') . '</p>';
+      return $output;
+
+    default:
+  }
+}
