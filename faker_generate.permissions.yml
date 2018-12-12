@@ -1,0 +1,4 @@
+faker generate content:
+  title: 'Faker Generate Content'
+  description: 'Allow generation of fake content for nodes'
+  restrict access: true

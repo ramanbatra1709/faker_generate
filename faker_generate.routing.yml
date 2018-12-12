@@ -4,4 +4,4 @@ faker_generate.generate_content:
     _form: '\Drupal\faker_generate\Form\FakerGenerateContentForm'
     _title: 'Generate Content'
   requirements:
-    _permission: 'access content'
+    _permission: 'faker generate content'
