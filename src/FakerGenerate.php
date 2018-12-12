@@ -170,7 +170,9 @@ class FakerGenerate {
       }
       $context['sandbox']['progress']++;
     }
-    $context['finished'] =$context['sandbox']['progress'] / $context['sandbox']['max'];
+    if ($context['sandbox']['progress'] != $context['sandbox']['max']) {
+      $context['finished'] = $context['sandbox']['progress'] / $context['sandbox']['max'];
+    }
     $context['results'] = $results;
   }
 
