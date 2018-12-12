@@ -46,8 +46,12 @@ class FakerGenerate {
 
   /**
    * @param $values
+   * @param $context
+   * @throws EntityStorageException
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public static function generateContent($values)  {
+  public static function generateContent($values, &$context )  {
 
     $faker = Faker\Factory::create();
 
@@ -65,8 +69,14 @@ class FakerGenerate {
 
     $results = array();
 
+    if (empty($context['sandbox'])) {
+      $context['sandbox']['progress'] = 0;
+      $context['sandbox']['max'] = $num;
+    }
+
     for ($i = 0; $i < $num; $i++) {
 
+      $context['message'] = 'Creating node ' . ($i + 1);
       $content_type = array_rand(array_filter($content_types));
       $uid = $users[array_rand($users)];
 
@@ -158,7 +168,28 @@ class FakerGenerate {
       } catch (EntityStorageException $e) {
         \Drupal::logger('fake_generator')->error('Could not store the node: ' . $e->getMessage());
       }
+      $context['sandbox']['progress']++;
     }
+    $context['finished'] =$context['sandbox']['progress'] / $context['sandbox']['max'];
+    $context['results'] = $results;
+  }
+
+  /**
+   * @param $success
+   * @param $results
+   * @param $operations
+   */
+  function nodesGeneratedFinishedCallback($success, $results, $operations) {
+    if ($success) {
+      $message = \Drupal::translation()->formatPlural(
+        count($results),
+        'One node created.', '@count nodes created.'
+      );
+    }
+    else {
+      $message = t('Finished with an error.');
+    }
+    drupal_set_message($message);
   }
 
 }

@@ -118,6 +118,17 @@ class FakerGenerateContentForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    FakerGenerate::generateContent($form_state->getValues());
+    $batch = array(
+      'init_message' => t('Executing batch process...'),
+      'title' => t('Creating nodes'),
+      'operations' => array(
+        array(
+          '\Drupal\faker_generate\FakerGenerate::generateContent',
+          array($form_state->getValues())
+        ),
+      ),
+      'finished' => '\Drupal\faker_generate\FakerGenerate::nodesGeneratedFinishedCallback',
+    );
+    batch_set($batch);
   }
 }
