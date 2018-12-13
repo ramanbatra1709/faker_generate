@@ -18,7 +18,8 @@ class FakerGenerate {
    */
   public static function getUsers($number) {
     $users = array();
-    $result = db_query_range("SELECT uid FROM {users}", 0, $number);
+    $database = \Drupal::database();
+    $result = $database->queryRange("SELECT uid FROM {users}", 0, $number);
     foreach ($result as $record) {
       $users[] = $record->uid;
     }
@@ -40,7 +41,7 @@ class FakerGenerate {
       $storage_handler = \Drupal::entityTypeManager()->getStorage("node");
       $nodes = $storage_handler->loadMultiple($nids);
       $storage_handler->delete($nodes);
-      drupal_set_message(t('Deleted %count nodes.', array('%count' => count($nids))));
+      \Drupal::messenger()->addMessage(t('Deleted %count nodes.', array('%count' => count($nids))));
     }
   }
 
@@ -88,7 +89,7 @@ class FakerGenerate {
         'revision' => $faker->boolean,
         'status' => TRUE,
         'promote' => $faker->boolean,
-        'created' => REQUEST_TIME - mt_rand(0, $values['settings']['time_range']),
+        'created' => \Drupal::time()->getRequestTime() - mt_rand(0, $values['settings']['time_range']),
         'langcode' => 'en'
       ]);
 
@@ -191,7 +192,7 @@ class FakerGenerate {
     else {
       $message = t('Finished with an error.');
     }
-    drupal_set_message($message);
+    \Drupal::messenger()->addMessage($message);
   }
 
 }
