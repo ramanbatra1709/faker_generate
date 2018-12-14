@@ -4,7 +4,6 @@ namespace Drupal\faker_generate\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\faker_generate\FakerGenerate;
 
 /**
  * Class FakerGenerateContentForm
