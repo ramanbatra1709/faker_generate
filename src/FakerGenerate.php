@@ -2,6 +2,7 @@
 
 namespace Drupal\faker_generate;
 
+use Drupal\comment\Entity\Comment;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
@@ -166,6 +167,24 @@ class FakerGenerate {
       }
       try {
         $results[] = $node->save();
+        $no_of_comments = $faker->numberBetween(0, $values['settings']['max_comments']);
+        for ($c = 0; $c < $no_of_comments; $c++)  {
+          $values = [
+            'entity_type' => 'node',
+            'entity_id'   => $node->id(),
+            'field_name'  => 'comment',
+            'uid' => $users[array_rand($users)],
+            'comment_type' => 'comment',
+            'subject' => $faker->realText($maxNbChars=20),
+            'comment_body' => [
+              'value' => $faker->realText($maxNbChars=75),
+              'format' => 'plain_text'
+            ],
+            'status' => 1,
+          ];
+          $comment = Comment::create($values);
+          $comment->save();
+        }
       } catch (EntityStorageException $e) {
         \Drupal::logger('fake_generator')->error('Could not store the node: ' . $e->getMessage());
       }
