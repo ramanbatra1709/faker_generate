@@ -6,7 +6,7 @@ use Drupal\comment\Entity\Comment;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
-use Faker;
+use Faker\Factory;
 
 /**
  * Provides a various helper functions for content generation.
@@ -14,11 +14,10 @@ use Faker;
 class FakerGenerate {
 
   /**
-   * @param $number
-   * @return array
+   * Return the list of all the users.
    */
   public static function getUsers($number) {
-    $users = array();
+    $users = [];
     $database = \Drupal::database();
     $result = $database->queryRange("SELECT uid FROM {users}", 0, $number);
     foreach ($result as $record) {
@@ -28,10 +27,7 @@ class FakerGenerate {
   }
 
   /**
-   * @param $values
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * Delete all the nodes of a type.
    */
   public static function deleteContent($values) {
     $nids = \Drupal::entityQuery('node')
@@ -42,20 +38,16 @@ class FakerGenerate {
       $storage_handler = \Drupal::entityTypeManager()->getStorage("node");
       $nodes = $storage_handler->loadMultiple($nids);
       $storage_handler->delete($nodes);
-      \Drupal::messenger()->addMessage(t('Deleted %count nodes.', array('%count' => count($nids))));
+      \Drupal::messenger()->addMessage(t('Deleted %count nodes.', ['%count' => count($nids)]));
     }
   }
 
   /**
-   * @param $values
-   * @param $context
-   * @throws EntityStorageException
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * Generates fake content using Faker PHP Library.
    */
-  public static function generateContent($values, &$context )  {
+  public static function generateContent($values, &$context) {
 
-    $faker = Faker\Factory::create();
+    $faker = Factory::create();
 
     if (!isset($values['settings']['time_range'])) {
       $values['settings']['time_range'] = 0;
@@ -69,7 +61,7 @@ class FakerGenerate {
       FakerGenerate::deleteContent(array_filter($content_types));
     }
 
-    $results = array();
+    $results = [];
 
     if (empty($context['sandbox'])) {
       $context['sandbox']['progress'] = 0;
@@ -91,7 +83,7 @@ class FakerGenerate {
         'status' => TRUE,
         'promote' => $faker->boolean,
         'created' => \Drupal::time()->getRequestTime() - mt_rand(0, $values['settings']['time_range']),
-        'langcode' => 'en'
+        'langcode' => 'en',
       ]);
 
       $entityManager = \Drupal::service('entity_field.manager');
@@ -101,8 +93,8 @@ class FakerGenerate {
 
         if (!empty($field_definition->getTargetBundle())) {
           $bundleFields[$field_name]['type'] = $field_definition->getType();
-          $value = null;
-          switch($bundleFields[$field_name]['type'])  {
+          $value = NULL;
+          switch ($bundleFields[$field_name]['type']) {
 
             case 'boolean':
               $value = $faker->boolean;
@@ -125,7 +117,7 @@ class FakerGenerate {
               break;
 
             case 'image':
-              $image = $faker->image('sites/default/files', $width = 640, $height = 480);
+              $image = $faker->image('sites/default/files', 640, 480);
               $file = File::create([
                 'uri' => $image,
               ]);
@@ -133,7 +125,7 @@ class FakerGenerate {
               $value = [
                 'target_id' => $file->id(),
                 'alt' => $faker->realText(20),
-                'title' => $faker->realText(20)
+                'title' => $faker->realText(20),
               ];
               break;
 
@@ -146,11 +138,11 @@ class FakerGenerate {
               break;
 
             case 'string':
-              $value = $faker->realText($maxNbChars = 100, $indexSize = 2);
+              $value = $faker->realText(100, 2);
               break;
 
             case 'string_long':
-              $value = $faker->realText($maxNbChars = 300, $indexSize = 2);
+              $value = $faker->realText(300, 2);
               break;
 
             case 'timestamp':
@@ -158,7 +150,7 @@ class FakerGenerate {
               break;
 
             case 'text_with_summary':
-              $value = $faker->realText($maxNbChars = 600, $indexSize = 2);
+              $value = $faker->realText(600, 2);
               break;
 
           }
@@ -168,24 +160,25 @@ class FakerGenerate {
       try {
         $results[] = $node->save();
         $no_of_comments = $faker->numberBetween(0, $values['settings']['max_comments']);
-        for ($c = 0; $c < $no_of_comments; $c++)  {
+        for ($c = 0; $c < $no_of_comments; $c++) {
           $values = [
             'entity_type' => 'node',
             'entity_id'   => $node->id(),
             'field_name'  => 'comment',
             'uid' => $users[array_rand($users)],
             'comment_type' => 'comment',
-            'subject' => $faker->realText($maxNbChars=20),
+            'subject' => $faker->realText(20),
             'comment_body' => [
-              'value' => $faker->realText($maxNbChars=75),
-              'format' => 'plain_text'
+              'value' => $faker->realText(75),
+              'format' => 'plain_text',
             ],
             'status' => 1,
           ];
           $comment = Comment::create($values);
           $comment->save();
         }
-      } catch (EntityStorageException $e) {
+      }
+      catch (EntityStorageException $e) {
         \Drupal::logger('fake_generator')->error('Could not store the node: ' . $e->getMessage());
       }
       $context['sandbox']['progress']++;
@@ -197,11 +190,9 @@ class FakerGenerate {
   }
 
   /**
-   * @param $success
-   * @param $results
-   * @param $operations
+   * Function to be called after batch completion.
    */
-  function nodesGeneratedFinishedCallback($success, $results, $operations) {
+  public function nodesGeneratedFinishedCallback($success, $results, $operations) {
     if ($success) {
       $message = \Drupal::translation()->formatPlural(
         count($results),

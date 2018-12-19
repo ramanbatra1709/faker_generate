@@ -11,9 +11,9 @@ CONTENTS OF THIS FILE
 INTRODUCTION
 ------------
 
-Faker module uses the faker PHP library to generate dummy content. This module is useful
-for the demonstration websites who do not want to use Lorem Ipsum text and ugly looking
-randomly generated images.
+Faker module uses the faker PHP library to generate dummy content. This module
+is useful for the demonstration websites who do not want to use Lorem Ipsum text
+and ugly looking randomly generated images.
 
  * For a full description of the module, visit the project page:
    https://www.drupal.org/project/faker_generate
@@ -42,7 +42,8 @@ INSTALLATION
 CONFIGURATION
 -------------
 
-No configuration options are present at the moment. To generate dummy content navigate to:
+No configuration options are present at the moment. To generate dummy content
+navigate to:
 
     Configuration > Development > Faker Generate Content
 

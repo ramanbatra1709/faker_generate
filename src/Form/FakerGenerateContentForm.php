@@ -6,14 +6,14 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class FakerGenerateContentForm
+ * Class FakerGenerateContentForm.
  *
  * @package Drupal\faker_generate\Form
  */
 class FakerGenerateContentForm extends FormBase {
 
   /**
-   * @return array
+   * Get list of all node types.
    */
   protected function getNodeTypesList() {
     $node_types_list = [];
@@ -27,25 +27,25 @@ class FakerGenerateContentForm extends FormBase {
   }
 
   /**
-   * @return array
+   * Get the list of formatted time range options.
    */
-  protected function getTimeRangeOptions()  {
-    $options = array(1 => $this->t('Now'));
-    foreach (array(3600, 86400, 604800, 2592000, 31536000) as $interval) {
+  protected function getTimeRangeOptions() {
+    $options = [1 => $this->t('Now')];
+    foreach ([3600, 86400, 604800, 2592000, 31536000] as $interval) {
       $options[$interval] = \Drupal::service('date.formatter')->formatInterval($interval, 1) . ' ' . $this->t('ago');
     }
     return $options;
   }
 
   /**
-   * {@inheritdoc}
+   * Get the form ID.
    */
   public function getFormId() {
     return 'faker_generate_content';
   }
 
   /**
-   * {@inheritdoc}
+   * Build the faker content generate form.
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['settings'] = [
@@ -78,12 +78,12 @@ class FakerGenerateContentForm extends FormBase {
       '#default_value' => 604800,
     ];
     $form['settings']['max_comments'] = [
-     '#type' => \Drupal::service('module_handler')->moduleExists('comment') ? 'number' : 'value',
-     '#title' => $this->t('Maximum number of comments per node.'),
-     '#description' => $this->t('You must also enable comments for the content types you are generating. Note that some nodes will randomly receive zero comments. Some will receive the max.'),
-     '#default_value' => 0,
-     '#min' => 0,
-     '#access' => \Drupal::service('module_handler')->moduleExists('comment'),
+      '#type' => \Drupal::service('module_handler')->moduleExists('comment') ? 'number' : 'value',
+      '#title' => $this->t('Maximum number of comments per node.'),
+      '#description' => $this->t('You must also enable comments for the content types you are generating. Note that some nodes will randomly receive zero comments. Some will receive the max.'),
+      '#default_value' => 0,
+      '#min' => 0,
+      '#access' => \Drupal::service('module_handler')->moduleExists('comment'),
     ];
     $form['settings']['title_length'] = [
       '#type' => 'number',
@@ -103,8 +103,7 @@ class FakerGenerateContentForm extends FormBase {
   }
 
   /**
-   * @param array $form
-   * @param FormStateInterface $form_state
+   * Form validation handler.
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValues();
@@ -114,20 +113,23 @@ class FakerGenerateContentForm extends FormBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Form submission handler.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $batch = array(
-      'init_message' => t('Executing batch process...'),
-      'title' => t('Creating nodes'),
-      'operations' => array(
-        array(
+    $batch = [
+      'init_message' => $this->t('Executing batch process...'),
+      'title' => $this->t('Creating nodes'),
+      'operations' => [
+        [
           '\Drupal\faker_generate\FakerGenerate::generateContent',
-          array($form_state->getValues())
-        ),
-      ),
+          [
+            $form_state->getValues(),
+          ],
+        ],
+      ],
       'finished' => '\Drupal\faker_generate\FakerGenerate::nodesGeneratedFinishedCallback',
-    );
+    ];
     batch_set($batch);
   }
+
 }
